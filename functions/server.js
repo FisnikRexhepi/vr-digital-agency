@@ -16,8 +16,7 @@ exports.handler = async function (event, ctx, callback) {
       "--single-process",
     ],
     executablePath:
-      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ||
-      (await chromium.executablePath),
+      process.env.CHROME_EXECUTABLE_PATH || (await chromium.executablePath),
     headless: true,
     ignoreHTTPSErrors: true,
   });
