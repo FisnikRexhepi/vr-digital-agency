@@ -7,9 +7,12 @@ exports.handler = async function (event, ctx, callback) {
   console.log(`Scraping URLs for keyword: ${keyword}`);
   const browser = await puppeteer.launch({
     args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
     executablePath: await chromium.executablePath,
     headless: true,
+    ignoreHTTPSErrors: true,
   });
+
   const page = await browser.newPage();
   const url = `https://www.google.com/search?q=${keyword}`;
   await page.goto(url);
