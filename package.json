@@ -14,6 +14,6 @@
     "express": "^4.17.1",
     "json2csv": "^6.0.0-alpha.2",
     "puppeteer": "^19.8.3",
-    "puppeteer-core": "^19.8.3"
+    "puppeteer-core": "^10.1.0"
   }
 }
