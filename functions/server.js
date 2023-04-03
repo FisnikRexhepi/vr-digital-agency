@@ -18,6 +18,7 @@ exports.handler = async function (event, ctx, callback) {
       "--no-zygote",
       "--single-process",
       "--disable-extensions",
+      "--use-gl=egl",
     ],
     defaultViewport: chromium.defaultViewport,
     executablePath:
