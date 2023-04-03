@@ -1,11 +1,14 @@
-const puppeteer = require("puppeteer-core");
+// const puppeteer = require("puppeteer-core");
 const CsvParser = require("json2csv").Parser;
-const chromium = require("@sparticuz/chromium");
+// const chromium = require("@sparticuz/chromium");
+const chromium = require("chrome-aws-lambda");
+
 exports.handler = async function (event, ctx, callback) {
   const body = JSON.parse(event.body);
   const keyword = body.keyword;
   console.log(`Scraping URLs for keyword: ${keyword}`);
-  const browser = await puppeteer.launch({
+  const browser = await chromium.puppeteer.launch({
+    headless: true,
     args: [
       "--disable-gpu",
       "--disable-dev-shm-usage",
@@ -15,17 +18,17 @@ exports.handler = async function (event, ctx, callback) {
       "--no-zygote",
       "--single-process",
     ],
+    defaultViewport: chromium.defaultViewport,
     executablePath:
       process.env.CHROME_EXECUTABLE_PATH || (await chromium.executablePath),
-    headless: true,
-    ignoreHTTPSErrors: true,
+    headless: chromium.headless,
   });
 
   const page = await browser.newPage();
   const url = `https://www.google.com/search?q=${keyword}`;
   await page.goto(url);
   let urls = [];
-  while (urls.length < 100) {
+  while (urls.length < 30) {
     const currentUrls = await page.evaluate(() => {
       const links = Array.from(document.querySelectorAll("a"));
       const urls = links.map((link) => link.href);
@@ -40,7 +43,7 @@ exports.handler = async function (event, ctx, callback) {
     urls = [...urls, ...currentUrls];
     urls = Array.from(new Set(urls));
     const nextButton = await page.$("#pnnext");
-    if (urls.length >= 100 || !nextButton) {
+    if (urls.length >= 30 || !nextButton) {
       break;
     }
     await Promise.all([
@@ -48,7 +51,7 @@ exports.handler = async function (event, ctx, callback) {
       page.click("#pnnext"),
     ]);
   }
-  const foundedUrl = urls.slice(0, 100).map((url) => ({ url }));
+  const foundedUrl = urls.slice(0, 30).map((url) => ({ url }));
   const csvFields = ["Url"];
   const csvParser = new CsvParser({ csvFields });
   const csvData = csvParser.parse(foundedUrl);
