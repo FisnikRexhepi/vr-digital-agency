@@ -17,9 +17,13 @@ exports.handler = async function (event, ctx, callback) {
       "--no-first-run",
       "--no-zygote",
       "--single-process",
+      "--disable-extensions",
     ],
     defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath,
+    executablePath:
+      process.env.CHROME_EXECUTABLE_PATH ||
+      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ||
+      (await chromium.executablePath),
     headless: chromium.headless,
   });
 
