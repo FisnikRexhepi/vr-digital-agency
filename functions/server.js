@@ -1,12 +1,20 @@
 const puppeteer = require("puppeteer-core");
 const CsvParser = require("json2csv").Parser;
-const chromium = require("chrome-aws-lambda");
+const chromium = require("@sparticuz/chromium");
 exports.handler = async function (event, ctx, callback) {
   const body = JSON.parse(event.body);
   const keyword = body.keyword;
   console.log(`Scraping URLs for keyword: ${keyword}`);
   const browser = await puppeteer.launch({
-    args: chromium.args,
+    args: [
+      "--disable-gpu",
+      "--disable-dev-shm-usage",
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--no-first-run",
+      "--no-zygote",
+      "--single-process",
+    ],
     executablePath:
       "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ||
       (await chromium.executablePath),
