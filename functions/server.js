@@ -7,8 +7,7 @@ exports.handler = async function (event, ctx, callback) {
   console.log(`Scraping URLs for keyword: ${keyword}`);
   const browser = await puppeteer.launch({
     args: chromium.args,
-    executablePath:
-      process.env.CHROME_EXECUTABLE_PATH || (await chromium.executablePath),
+    executablePath: await chromium.executablePath,
     headless: true,
   });
   const page = await browser.newPage();
