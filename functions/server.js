@@ -2,11 +2,15 @@
 const CsvParser = require("json2csv").Parser;
 // const chromium = require("@sparticuz/chromium");
 const chromium = require("chrome-aws-lambda");
-
+const locateChrome = require("locate-chrome");
 exports.handler = async function (event, ctx, callback) {
   const body = JSON.parse(event.body);
   const keyword = body.keyword;
   console.log(`Scraping URLs for keyword: ${keyword}`);
+  const executablePath = await new Promise((resolve) =>
+    locateChrome((arg) => resolve(arg))
+  );
+  console.log(executablePath);
   const browser = await chromium.puppeteer.launch({
     headless: true,
     args: [
@@ -21,10 +25,7 @@ exports.handler = async function (event, ctx, callback) {
       "--use-gl=egl",
     ],
     defaultViewport: chromium.defaultViewport,
-    executablePath:
-      process.env.CHROME_EXECUTABLE_PATH ||
-      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ||
-      (await chromium.executablePath),
+    executablePath: executablePath,
     headless: chromium.headless,
   });
 
